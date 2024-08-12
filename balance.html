@@ -1,0 +1,44 @@
+<h1>Balance</h1>
+<button onclick="balance()">balance</button>
+<code id="display"></code>
+
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"
+></script>
+<script src="comet.js"></script>
+
+<script>
+  async function balance() {
+    // check for metamask
+    if (!window.ethereum) return alert("Please install wallet");
+    // connect & get account
+    const [account] = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    // get provider
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // connect to usdc contract
+    const usdcContract = new ethers.Contract(
+      comet.usdc.address,
+      erc20.abi,
+      provider
+    );
+    // get usdc balance
+    const usdcBalance = await usdcContract.balanceOf(account);
+
+    // connect to cusdc contract
+    const cusdcContract = new ethers.Contract(
+      comet.usdc.v3,
+      comet.abi,
+      provider
+    );
+    // get cusdc balance
+    const cusdcBalance = await cusdcContract.balanceOf(account);
+    // parse eth
+    document.getElementById("display").innerHTML = JSON.stringify({
+      USDC: ethers.utils.formatUnits(usdcBalance, comet.usdc.decimals),
+      cUSDC: ethers.utils.formatUnits(cusdcBalance, comet.usdc.decimals),
+    });
+  }
+</script>

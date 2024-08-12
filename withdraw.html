@@ -1,0 +1,40 @@
+<h1>withdraw(erc20address, amount)</h1>
+<button onclick="withdraw('0x2D5ee574e710219a521449679A4A7f2B43f046ad', '0.15')">
+  Withdraw 0.1 WETH
+</button>
+<button onclick="withdraw('0xb9fa8F5eC3Da13B508F462243Ad0555B46E028df', '0.1')">
+  Withdraw 0.1 cbETH
+</button>
+
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"
+></script>
+<script src="comet.js"></script>
+
+<script>
+  async function withdraw(erc20Address, amount) {
+    // check for metamask
+    if (!window.ethereum) return alert("Please install wallet");
+    // connect & get account
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    // get provider
+    const provider = new ethers.providers.Web3Provider(
+      window.ethereum
+    ).getSigner();
+    // convert withdraw amount 
+    amount = ethers.utils.parseUnits(amount, comet.weth.decimals);
+    // connect to comet contract
+    const cometContract = new ethers.Contract(
+      comet.weth.v3,
+      comet.abi,
+      provider
+    );
+    // https://github.com/ajb413/compound-ethwaterloo-2023-workshop/blob/master/public/app.js#L97
+    const cometReceipt = await cometContract.withdraw(
+      comet.weth.address,
+      amount
+    );
+    console.log({ cometReceipt });
+  }
+</script>
